@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from './user.service';
-import { Observable, startWith, switchMap } from 'rxjs';
 import { IUser } from './user.interface';
-import { FormControl } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-user',
@@ -10,58 +10,52 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./user.component.css'],
 })
 export class UserComponent implements OnInit {
-  private originalUsers: IUser[] = [];
   public users: IUser[] = [];
-  public selectedUsers: number[] = [];
-  public sort = new FormControl('asc');
-  public search = new FormControl('');
+  public form: FormGroup = this.fb.group({
+    firstName: [null, [Validators.required, Validators.minLength(2)]],
+    lastName: [
+      null,
+      [Validators.required, Validators.minLength(2), Validators.maxLength(60)],
+    ],
+    email: [null, [Validators.required, Validators.email]],
+    phone: [null, [Validators.required, Validators.pattern('^[0-9]*$')]],
+  });
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private snackBar: MatSnackBar,
+    private fb: FormBuilder
+  ) {}
 
   ngOnInit(): void {
     this.getUsers();
-    this.subscribeOnSort();
   }
 
   getUsers() {
-    this.search.valueChanges
-      .pipe(
-        startWith(''),
-        switchMap((val) => this.userService.getUsers(val))
-      )
-      .subscribe((res) => {
-        this.users = res;
-      });
-  }
-
-  subscribeOnSort() {
-    this.sort.valueChanges.subscribe((val) => {
-      if (val === 'asc') {
-        this.users = this.users.sort((a, b) => a.id - b.id);
-      } else {
-        this.users = this.users.sort((a, b) => b.id - a.id);
-      }
+    this.userService.list().subscribe((res) => {
+      this.users = res;
     });
   }
 
-  deleteSelected() {
-    this.users = this.users.filter((user) => !this.isSelected(user.id));
+  deleteUser(id: IUser['id']) {
+    this.userService.delete(id).subscribe(() => {
+      this.users = this.users.filter((user) => user.id !== id);
+      this.snackBar.open(`User with id:  ${id} deleted`);
+    });
   }
 
-  toggleSelection(id: number) {
-    if (this.isSelected(id)) {
-      this.selectedUsers = this.selectedUsers.filter((el) => el !== id);
-    } else {
-      this.selectedUsers.push(id);
-    }
-  }
+  submit() {
+    const { firstName, lastName, email, phone } = this.form.value;
+    const body: Partial<IUser> = {
+      email,
+      phone,
+      username: `${firstName} ${lastName}`,
+    };
 
-  isSelected(id: number): boolean {
-    return this.selectedUsers.includes(id);
-  }
-
-  selectAll() {
-    this.selectedUsers = [];
-    this.users.forEach((user) => this.toggleSelection(user.id));
+    this.userService.create(body).subscribe((user) => {
+      this.users = [...this.users, user];
+      this.snackBar.open(`User ${user.username} addeed`);
+      this.form.reset();
+    });
   }
 }

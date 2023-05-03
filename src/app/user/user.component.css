@@ -17,3 +17,7 @@
 .card {
   margin-bottom: 20px;
 }
+
+.ng-invalid.ng-touched {
+  border-color: red;
+}

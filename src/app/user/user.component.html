@@ -1,34 +1,7 @@
-<mat-toolbar color="primary" class="action">
-  <div class="flex-center">
-    <button mat-raised-button class="mr" (click)="selectAll()">
-      Select all
-    </button>
-    <button
-      mat-raised-button
-      class="mr"
-      (click)="deleteSelected()"
-      [disabled]="!this.selectedUsers.length"
-    >
-      Delete
-    </button>
-    <mat-form-field appearance="fill">
-      <mat-label>Sorting order:</mat-label>
-      <mat-select [formControl]="sort">
-        <mat-option value="asc">Ascending</mat-option>
-        <mat-option value="desc">Descending</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div>
-    <form>
-      <mat-form-field>
-        <mat-label>Search</mat-label>
-        <input matInput placeholder="search" [formControl]="search" />
-      </mat-form-field>
-    </form>
-  </div>
-</mat-toolbar>
 <mat-card>
+  <mat-card-header>
+    <mat-card-title>List of users</mat-card-title>
+  </mat-card-header>
   <mat-card-content>
     <mat-card *ngFor="let user of users" class="card">
       <mat-card-content>
@@ -36,21 +9,88 @@
         <div>
           name:
           <b
-            ><span>{{ user.firstname }} {{ user.lastname }}</span></b
+            ><span>{{ user.username }} </span></b
           >
         </div>
         <div>email: {{ user.email }}</div>
         <div>phone: {{ user.phone }}</div>
       </mat-card-content>
       <mat-card-actions>
-        <section class="example-section">
-          <mat-checkbox
-            (change)="toggleSelection(user.id)"
-            [checked]="isSelected(user.id)"
-            >Select user</mat-checkbox
-          >
-        </section>
+        <button (click)="deleteUser(user.id)" mat-raised-button color="primary">
+          Delete User
+        </button>
       </mat-card-actions>
     </mat-card>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Form for adding new user</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div>
+        <mat-form-field>
+          <mat-label>First Name</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="firstName"
+            placeholder="Oleksa"
+          />
+          <mat-hint> the first name field must be longer than 2 chars</mat-hint>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Last Name</mat-label>
+          <input
+            type="text"
+            matInput
+            formControlName="lastName"
+            placeholder="Marko"
+          />
+          <mat-hint>
+            the last name field must be longer than 2 chars and not longer than
+            60 chars</mat-hint
+          >
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input
+            type="email"
+            matInput
+            formControlName="email"
+            placeholder="Ex. pat@example.com"
+          />
+          <mat-hint> the email field must be email type </mat-hint>
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field>
+          <mat-label>Phone</mat-label>
+          <input
+            type="number"
+            matInput
+            formControlName="phone"
+            placeholder="06300000"
+          />
+          <mat-hint> the phone field must be only numeric symbols </mat-hint>
+        </mat-form-field>
+      </div>
+      <div>
+        <button
+          type="submit"
+          [disabled]="form.invalid"
+          mat-raised-button
+          color="primary"
+        >
+          Add User
+        </button>
+      </div>
+    </form>
   </mat-card-content>
 </mat-card>

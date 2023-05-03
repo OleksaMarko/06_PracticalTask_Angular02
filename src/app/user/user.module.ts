@@ -9,6 +9,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { UserService } from './user.service';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [UserComponent],
@@ -21,6 +23,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatSelectModule,
     MatCheckboxModule,
     ReactiveFormsModule,
+    HttpClientModule,
+    MatSnackBarModule,
   ],
   providers: [UserService],
   exports: [UserComponent],
